@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  pull_request:
+    # labeled/unlabeled so adding the guardrail-change label re-runs the guardrails job
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Placeholders so `next build` can validate env. Never real values; real ones live in Vercel.
+      DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
+      BETTER_AUTH_SECRET: ci-placeholder-ci-placeholder-ci-0000
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e
+
+  guardrails:
+    # Agents must not weaken the rules to get green. Any change to a guardrail file needs a human
+    # to add the `guardrail-change` label after reviewing it.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE_REF: ${{ github.base_ref }}
+      LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Guardrail change requires label
+        run: |
+          set -euo pipefail
+          GUARDRAILS='^(biome\.json|tools/biome/|tsconfig\.json|\.dependency-cruiser\.cjs|knip\.json|vitest\.config\.ts|playwright\.config\.ts|lefthook\.yml|commitlint\.config\.ts|pnpm-workspace\.yaml|\.github/)'
+          TOUCHED=$(git diff --name-only "origin/${BASE_REF}...HEAD" | grep -E "$GUARDRAILS" || true)
+
+          # package.json changes often (dependencies), so only its scripts count as a guardrail.
+          BASE_SCRIPTS=$(git show "origin/${BASE_REF}:package.json" | jq -S .scripts)
+          HEAD_SCRIPTS=$(jq -S .scripts package.json)
+          if [ "$BASE_SCRIPTS" != "$HEAD_SCRIPTS" ]; then
+            TOUCHED=$(printf '%s\npackage.json (scripts)' "$TOUCHED")
+          fi
+
+          if [ -z "$(printf '%s' "$TOUCHED" | tr -d '[:space:]')" ]; then
+            echo "No guardrail files changed."
+            exit 0
+          fi
+
+          echo "Guardrail files changed:"
+          printf '%s\n' "$TOUCHED" | sed '/^$/d; s/^/  - /'
+          if printf '%s' "$LABELS" | jq -e 'index("guardrail-change")' > /dev/null; then
+            echo "Label 'guardrail-change' is present. Allowed."
+          else
+            echo "::error::Guardrail files changed. A human must review this PR and add the 'guardrail-change' label."
+            exit 1
+          fi
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

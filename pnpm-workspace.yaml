@@ -1,0 +1,5 @@
+# pnpm settings live here (pnpm 11+ no longer reads the "pnpm" field in package.json).
+# Dependency build scripts are denied unless listed. Add a package only after reading what its script does.
+allowBuilds:
+  esbuild: true
+  lefthook: true

@@ -1,0 +1,21 @@
+# Guardrail files: changes need review by the owner. Keep in sync with the list in
+# .github/workflows/ci.yml (guardrails job) and AGENTS.md (Hard rules).
+
+/.github/                  @jono-r
+/biome.json                @jono-r
+/tools/biome/              @jono-r
+/tsconfig.json             @jono-r
+/.dependency-cruiser.cjs   @jono-r
+/knip.json                 @jono-r
+/vitest.config.ts          @jono-r
+/playwright.config.ts      @jono-r
+/lefthook.yml              @jono-r
+/commitlint.config.ts      @jono-r
+/pnpm-workspace.yaml       @jono-r
+/package.json              @jono-r
+/renovate.json             @jono-r
+
+# The rules themselves
+/AGENTS.md                 @jono-r
+/docs/constitution.md      @jono-r
+/docs/decisions/           @jono-r

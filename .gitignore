@@ -1,0 +1,22 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# env: only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# local database (pglite)
+.pglite/
+
+# test output
+.vitest/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+.DS_Store
+.vercel/
