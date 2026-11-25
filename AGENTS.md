@@ -4,9 +4,9 @@ This file is a map. It tells you where things are and which rules are hard. Deta
 
 ## What this is
 
-<One paragraph: the product, who uses it, the core flow. Filled in when a product is created from this template.>
+Visitors join the tiny-waitlist launch list by leaving their email address. The owner signs in to see who joined; visitors cannot browse the list.
 
-Until then: this is `factory-template`, the starting point for every TypeScript micro-SaaS in the factory. It ships one example module (`src/modules/example`, a notes feature) and one example integration (`src/integrations/email`). Copy their shape. Delete them once the product has real modules.
+The template ships one example module (`src/modules/example`, a notes feature) and one example integration (`src/integrations/email`). Copy their shape. Delete them once the product has real modules.
 
 ## Commands
 

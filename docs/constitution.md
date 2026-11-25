@@ -4,7 +4,7 @@ The rules that do not change from feature to feature. If a spec, a prompt or a d
 
 ## Product
 
-<Filled in when a product is created from this template: what it is, who it is for, the one core flow, what it will deliberately never do.>
+tiny-waitlist lets visitors leave an email address before launch and lets the owner see the signups. It does not publish subscriber addresses or run email campaigns.
 
 ## The one rule
 
