@@ -66,6 +66,10 @@ Confirmation emails, campaigns, referrals, exports, and multiple waitlists.
 
 Store the email address and first signup time. Each distinct address appears only once. Addresses are personal data: never log submitted addresses or put real subscriber data in the repository. There is no prior list to migrate.
 
+## Access decision
+
+The public form accepts a new email submission without sign-in. It cannot look up, edit, or delete an existing signup. A repeat submission changes nothing and receives the same acknowledgement. Only the signed-in owner can read the list, including through direct data requests.
+
 ## Open questions
 
-- [ ] [NEEDS CLARIFICATION: Jono — confirm that visitors should be able to submit without signing in. Before implementation, resolve how write-only signup fits the template rule requiring authentication on routes that change user data. Admin reads must remain authenticated and owner-only.]
+None.
